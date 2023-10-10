@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:dbserver="http://www.mulesoft.org/schema/mule/dbserver"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/dbserver http://www.mulesoft.org/schema/mule/dbserver/current/mule-dbserver.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<munit:config
+		name="meetup-testcontainer-set-speaker-test-suite.xml" />
+
+	<munit:before-test
+		name="meetup-testcontainer-set-speaker-test-suite-before-test"
+		doc:id="d2988e59-be7a-47b8-9d43-047546446451">
+		<dbserver:execute doc:name="delete speakers" doc:id="3268c646-4bb5-49ac-97ea-bcfcf99f7727" config-ref="MUnit_DB_Server_Config" sql="DELETE FROM speaker_tbl" />
+		<dbserver:execute doc:name="delete meetups" doc:id="77f941b5-73c2-4726-accb-c06b202a27cc" config-ref="MUnit_DB_Server_Config" sql="DELETE FROM meetup_tbl" />
+		<dbserver:execute doc:name="insert speakers" doc:id="8696f6dc-0858-4499-b4b0-b4cef70dff0c" config-ref="MUnit_DB_Server_Config" sql="INSERT INTO speaker_tbl (speaker_name, speaker_email)
+VALUES
+	('Benjamin Luedicke', 'benjamin.luedicke@codecentric.de'),
+	('Roger Butenuth', 'roger.butenuth@codecentric.de'),
+	('Pasquale Brunelli', 'pasquale.brunelli@codecentric.de');" />
+		<dbserver:execute doc:name="insert meetups" doc:id="1719aba7-ec69-4647-8073-653db0b17ea2" config-ref="MUnit_DB_Server_Config" sql="INSERT INTO meetup_tbl (meetup_title, meetup_description, speaker_id)
+VALUES
+	('Datenbanken testen mit Testcontainers', 'Testen mit Mocks ist schön und gut, aber funktioniert ein SQL-Statement wirklich mit der Datenbank, die wir im echten Leben einsetzen? Das weiß man erst, wenn man auch damit testet. Genau das wird mit Hilfe von Testcontainers möglich. Benjamin wird live zeigen, wie es funktioniert.', 1),
+	('Kleine Helferlein für Schleifen', 'Mule bietet serienmäßig ein paar Schleifenkonstrukte, sowohl im Flow als auch in DataWeave. Bestimmte Dinge wie eine While-Schleife fehlen jedoch. Ebenso ist es schwierig, eine payload in einer Schleife zusammen zu bauen. Und wenn man es schafft, macht einem der Heap gerne Probleme. Roger wird live zeigen, wie man dies mit seinem loop-module erledigen kann.', 2),
+	('Neuigkeiten in Mule 4.5', 'Was gibts neues in Mule 4.5 und lohnt sich ein Update?', null);" />
+	
+	</munit:before-test>
+	<munit:test name="meetup-testcontainer-set-speaker-main-test" doc:id="5f75d365-b3e0-41f1-9a7f-670c35b65414" description="Test">
+		<munit:execution >
+			<set-variable value="3" doc:name="meetupId" doc:id="38f63d70-c33f-469c-ab36-4bd515610662" variableName="meetupId"/>
+			<set-variable value="3" doc:name="speakerId" doc:id="2d111096-9851-4735-b0c9-0fd007d2de28" variableName="speakerId"/>
+			<flow-ref doc:name="Flow-ref to meetup-testcontainer-set-speaker-main" doc:id="d27f4116-50f8-41f7-82fd-15c57673d04c" name="meetup-testcontainer-set-speaker-main"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="created text is as expected" doc:id="fc6907e4-cce4-4ace-8ef2-4a64b4f1bea6" actual="#[payload.text]" expected="Speaker 3 assigned to meeetup 3"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

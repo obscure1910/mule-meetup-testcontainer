@@ -4,7 +4,7 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
-	<db:config name="Database_Config_Postgresql" doc:name="Database Config" doc:id="87ccdfdf-2bba-48e2-9ff8-68806d1c3f8d" >
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="87ccdfdf-2bba-48e2-9ff8-68806d1c3f8d" >
 		<db:generic-connection url="${db.url}" driverClassName="${db.driver.classname}" user="${db.user}" password="${db.password}"/>
 	</db:config>
 	<configuration-properties doc:name="Configuration properties" doc:id="9d70d2d8-359b-4952-aeb0-83ce99c4f5b9" file="${env}.properties" />

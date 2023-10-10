@@ -6,7 +6,7 @@
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="meetup-testcontainer-get-all-meetups-main" doc:id="151d76f5-f12d-4005-8c32-ee0bcd3042e7" >
-		<db:select doc:name="Select all meetups" doc:id="c36fa78b-226a-4350-9edf-2dc8bf9badcb" config-ref="Database_Config_Postgresql">
+		<db:select doc:name="Select all meetups" doc:id="c36fa78b-226a-4350-9edf-2dc8bf9badcb" config-ref="Database_Config">
 			<db:sql><![CDATA[select st.speaker_id, speaker_name, speaker_email, mt.meetup_id, mt.meetup_title, mt.meetup_description 
 from speaker_tbl st 
 full outer join meetup_tbl mt on st.speaker_id = mt.speaker_id ]]></db:sql>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dbserver="http://www.mulesoft.org/schema/mule/dbserver"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/dbserver http://www.mulesoft.org/schema/mule/dbserver/current/mule-dbserver.xsd">
+	<munit:config name="meetup-testcontainer-get-all-meetups-test-suite.xml" />
+	<munit:before-test name="meetup-testcontainer-get-all-meetups-test-suite-before-test" doc:id="4ab6bc88-0ef3-4547-9fe3-affc0fdc1d6a" >
+		<dbserver:execute doc:name="delete speakers" doc:id="adcaca62-7ff1-489e-b29c-0b0df54de149" config-ref="MUnit_DB_Server_Config" sql="DELETE FROM speaker_tbl" />
+		<dbserver:execute doc:name="delete meetups" doc:id="5ae9e504-74b3-48ed-92c3-84f4e2617ef9" config-ref="MUnit_DB_Server_Config" sql="DELETE FROM meetup_tbl" />
+		<dbserver:execute doc:name="insert speakers" doc:id="ceb6fea6-692c-4296-8a91-ba932681a46c" config-ref="MUnit_DB_Server_Config" sql="INSERT INTO speaker_tbl (speaker_name, speaker_email)
+VALUES
+	('Benjamin Luedicke', 'benjamin.luedicke@codecentric.de'),
+	('Roger Butenuth', 'roger.butenuth@codecentric.de'),
+	('Pasquale Brunelli', 'pasquale.brunelli@codecentric.de');" />
+			<dbserver:execute doc:name="insert meetups" doc:id="0923b600-dcb4-42d3-98fc-4f1d5d4ff494" config-ref="MUnit_DB_Server_Config" sql="INSERT INTO meetup_tbl (meetup_title, meetup_description, speaker_id)
+VALUES
+	('Datenbanken testen mit Testcontainers', 'Testen mit Mocks ist schön und gut, aber funktioniert ein SQL-Statement wirklich mit der Datenbank, die wir im echten Leben einsetzen? Das weiß man erst, wenn man auch damit testet. Genau das wird mit Hilfe von Testcontainers möglich. Benjamin wird live zeigen, wie es funktioniert.', 1),
+	('Kleine Helferlein für Schleifen', 'Mule bietet serienmäßig ein paar Schleifenkonstrukte, sowohl im Flow als auch in DataWeave. Bestimmte Dinge wie eine While-Schleife fehlen jedoch. Ebenso ist es schwierig, eine payload in einer Schleife zusammen zu bauen. Und wenn man es schafft, macht einem der Heap gerne Probleme. Roger wird live zeigen, wie man dies mit seinem loop-module erledigen kann.', 2),
+	('Neuigkeiten in Mule 4.5', 'Was gibts neues in Mule 4.5 und lohnt sich ein Update?', null);" />
+	</munit:before-test>
+	<munit:test name="meetup-testcontainer-get-all-meetups-main-test" doc:id="9d2890bb-43b1-4949-adee-4a9bdfc86778" description="Test" expectedErrorType="DB:QUERY_EXECUTION">
+		<munit:execution>
+			<flow-ref doc:name="Flow-ref to meetup-testcontainer-get-all-meetups-main" doc:id="845d3d3f-3ff3-415b-83ed-24258af7a472" name="meetup-testcontainer-get-all-meetups-main" />
+		</munit:execution>
+	</munit:test>
+
+
+</mule>

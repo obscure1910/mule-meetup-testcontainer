@@ -6,9 +6,10 @@
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="meetup-testcontainer-set-speaker-main" doc:id="fed1f714-350c-4c2f-904d-b7fb909e5a2b" >
-		<db:update doc:name="Update" doc:id="52a65779-bc8b-4484-95fb-df3e888db3f4" config-ref="Database_Config_Postgresql" fetchSize="10" maxRows="10">
+		<logger level="INFO" doc:name="Logger" doc:id="703f5210-43d7-4e07-8eba-4c1e3b880f18" message='#["Connect to: $(p("db.url"))"]'/>
+		<db:update doc:name="Update" doc:id="52a65779-bc8b-4484-95fb-df3e888db3f4" config-ref="Database_Config">
 			<reconnect />
-			<db:sql ><![CDATA[update public.meetup_tbl set speaker_id = :speakerId where meetup_id = :meetupId]]></db:sql>
+			<db:sql ><![CDATA[update meetup_tbl set speaker_id = :speakerId where meetup_id = :meetupId]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{
 	speakerId: vars.speakerId,
 	meetupId: vars.meetupId
