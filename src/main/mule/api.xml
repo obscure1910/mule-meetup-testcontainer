@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <http:listener-config name="api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="api-config" api="api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="api-main">
+        <http:listener config-ref="api-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="api-config" />
+    </flow>
+    <flow name="api-console">
+        <http:listener config-ref="api-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="api-config" />
+    </flow>
+    <flow name="get:\meetups:api-config">
+        <logger level="INFO" message="Get all Meetups and truncate description" doc:name="INFO Logger" />
+        <flow-ref doc:name="meetup-testcontainer-get-all-meetups" doc:id="eeafc529-6590-49a6-b853-dbd1a4ae9021" name="meetup-testcontainer-get-all-meetups-main" />
+        <ee:transform doc:name="to JSON" doc:id="f252c813-c267-4675-aabb-9f93bb695def">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	meetups: payload
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="put:\meetups\(meetupId)\speakers:application\json:api-config">
+        <logger level="INFO" doc:name="INFO Logger" doc:id="d94d7028-64d5-4ee7-a870-155fa16a908e" message="Get all Meetups and truncate description" />
+        <set-variable value="#[attributes.uriParams.'meetupId']" doc:name="meetupId" doc:id="95ebdeff-5e29-4eef-8148-057f7e7f6891" variableName="meetupId" />
+        <set-variable value="#[payload.speakerId]" doc:name="speakerId" doc:id="7cc0898a-8677-4389-9fad-4200d65b5b2c" variableName="speakerId" />
+        <flow-ref doc:name="meetup-testcontainer-set-speaker-main" doc:id="ee9eb316-b032-443b-a808-2cf85cd9cc3a" name="meetup-testcontainer-set-speaker-main" />
+        <ee:transform doc:name="to JSON" doc:id="1e694c70-4ef0-4918-b0c7-c46aac1278bb">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

@@ -1,0 +1,48 @@
+#%RAML 1.0
+title: Meetup API
+version: 1.0
+
+types:
+  SpeakerId: integer
+  MeetupId: integer
+
+  Meetup:
+    properties:
+      speakerId: SpeakerId
+      speakerName: string
+      speakerEmail: string
+      meetupId: MeetupId
+      meetupTitle: string
+      meetupDescription: string
+
+  Speaker:
+    properties:
+      speakerId: SpeakerId
+
+/meetups:
+  get:
+    description: Get all meetups
+    responses:
+      200:
+        body:
+          application/json:
+            type: object
+            properties: 
+              meetups: Meetup[]
+
+  /{meetupId}/speakers:
+    uriParameters:
+      meetupId:
+        type: MeetupId
+    put:
+      description: Set speaker of meetup
+      body:
+        application/json:
+          type: Speaker
+      responses:
+        200:
+          body:
+            application/json:
+              type: object
+              properties:
+                text: string

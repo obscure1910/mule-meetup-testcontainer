@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_fed1f714_350c_4c2f_904d_b7fb909e5a2b_Output_Variables_speakerId = Number
+
