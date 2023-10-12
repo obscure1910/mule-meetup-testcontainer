@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:mule-testcontainers-db="http://www.mulesoft.org/schema/mule/mule-testcontainers-db" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/mule-testcontainers-db http://www.mulesoft.org/schema/mule/mule-testcontainers-db/current/mule-mule-testcontainers-db.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<munit:config name="meetup-testcontainer-get-all-meetups-test-suite.xml" />
+	<mule-testcontainers-db:config name="Mule_testcontainers_db_Config" doc:name="Mule-testcontainers-db Config" doc:id="0ece868b-682b-4ea7-a052-054e781bd719" jdbcUrl="${db.url}" />
+	<global-property doc:name="Global Property" doc:id="781faf07-39e1-4950-8a5a-4473e3f36af0" name="env" value="munit" />
+	<munit:before-suite name="meetup-testcontainer-get-all-meetups-test-suite-before-suite" doc:id="c6b85bf4-213c-4adc-8c0a-b65216cd83f1" >
+		<mule-testcontainers-db:start-test-containers doc:name="Start test containers" doc:id="2f1c69fe-a73f-4ec5-bf88-caf2db0ce8ea" config-ref="Mule_testcontainers_db_Config"/>
+		<db:execute-ddl doc:name="Execute DDL" doc:id="a111ebb1-e336-4484-b438-d8c6c66d3cf2" config-ref="Database_Config_Postgresql">
+			<db:sql ><![CDATA[DROP TABLE IF EXISTS speaker_tbl;
+DROP TABLE IF EXISTS meetup_tbl;
+
+CREATE TABLE speaker_tbl (
+  speaker_id SERIAL PRIMARY KEY,
+  speaker_name VARCHAR(255) NOT null,
+  speaker_email VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE meetup_tbl (
+  meetup_id SERIAL PRIMARY KEY,
+  meetup_title VARCHAR(255) NOT NULL,
+  meetup_description VARCHAR(1024) NOT NULL,
+  speaker_id INTEGER
+);
+
+INSERT INTO speaker_tbl (speaker_name, speaker_email)
+VALUES
+	('Benjamin Luedicke', 'benjamin.luedicke@codecentric.de'),
+	('Roger Butenuth', 'roger.butenuth@codecentric.de'),
+	('Pasquale Brunelli', 'pasquale.brunelli@codecentric.de');
+
+INSERT INTO meetup_tbl (meetup_title, meetup_description, speaker_id)
+VALUES
+	('Datenbanken testen mit Testcontainers', 'Testen mit Mocks ist schön und gut, aber funktioniert ein SQL-Statement wirklich mit der Datenbank, die wir im echten Leben einsetzen? Das weiß man erst, wenn man auch damit testet. Genau das wird mit Hilfe von Testcontainers möglich. Benjamin wird live zeigen, wie es funktioniert.', 1),
+	('Kleine Helferlein für Schleifen', 'Mule bietet serienmäßig ein paar Schleifenkonstrukte, sowohl im Flow als auch in DataWeave. Bestimmte Dinge wie eine While-Schleife fehlen jedoch. Ebenso ist es schwierig, eine payload in einer Schleife zusammen zu bauen. Und wenn man es schafft, macht einem der Heap gerne Probleme. Roger wird live zeigen, wie man dies mit seinem loop-module erledigen kann.', 2),
+	('Neuigkeiten in Mule 4.5', 'Was gibts neues in Mule 4.5 und lohnt sich ein Update?', null);
+]]></db:sql>
+		</db:execute-ddl>
+	</munit:before-suite>
+	<munit:after-suite name="meetup-testcontainer-get-all-meetups-test-suite-after-suite" doc:id="2a6fb97a-a5c4-494c-955e-ef4bfb5ee400" >
+		<mule-testcontainers-db:stop-test-containers doc:name="Stop test containers" doc:id="8cd3d7d6-cd92-486c-9500-0b54df6d1301" config-ref="Mule_testcontainers_db_Config"/>
+	</munit:after-suite>
+	<munit:test name="meetup-testcontainer-get-all-meetups-main-test" doc:id="5ec2e0da-97a7-4859-8ef5-9f8743543434" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to meetup-testcontainer-get-all-meetups-main" doc:id="3ac0b8b6-05ab-4ab2-a503-57cba3d40aa7" name="meetup-testcontainer-get-all-meetups-main"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that payload has speaker Ids" doc:id="6744f991-3a9a-4fa5-8e48-632b30e7d65b" is="#[MunitTools::equalTo([1,2,3,null])]" expression="#[payload.speakerId]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
